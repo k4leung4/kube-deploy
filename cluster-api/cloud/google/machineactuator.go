@@ -285,6 +285,9 @@ func (gce *GCEClient) Delete(machine *clusterv1.Machine) error {
 
 	if instance == nil {
 		glog.Infof("Skipped deleting a VM that is already deleted.\n")
+		// Remove the finalizer
+		machine.ObjectMeta.Finalizers = util.Filter(machine.ObjectMeta.Finalizers, clusterv1.MachineFinalizer)
+		_, err = gce.machineClient.Update(machine)
 		return nil
 	}
 
